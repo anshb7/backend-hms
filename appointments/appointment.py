@@ -22,6 +22,7 @@ def book_appointment(db: Session, appointment: schemas.AppointmentCreate ,doctor
         doctor_id=doctor_id,
         status=models.AppointmentStatus.scheduled,
         appointment_date=appointment.appointment_date,
+        appointment_time=appointment.appointment_time,
         reason=appointment.reason,
     )
     db.add(db_appointment)

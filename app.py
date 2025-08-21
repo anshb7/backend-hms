@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import models, schemas
-from routes import patient,doctor, appointment
+from routes import patient,doctor, appointment,user
 from database import db_engine
 
 app = FastAPI()
@@ -16,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
 )
 
+app.include_router(user.router)
 app.include_router(patient.router)
 app.include_router(doctor.router)
 app.include_router(appointment.router)

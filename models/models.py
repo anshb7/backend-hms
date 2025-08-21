@@ -1,5 +1,5 @@
-import datetime
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey,Enum
+from datetime import date, time
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey,Enum,Date,Time
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -13,10 +13,11 @@ class RoleEnum(str, enum.Enum):
 class User(Base):
     __tablename__ = 'users'
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     username = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
+    ph_number=Column(Integer, nullable=False)
     role = Column(Enum(RoleEnum), default=RoleEnum.patient)
     patients = relationship("Patient", back_populates="user")
     doctors = relationship("Doctor", back_populates="user")
@@ -59,7 +60,8 @@ class Appointment(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     doctor_id = Column(Integer, ForeignKey("doctors.id"))
-    appointment_date = Column(DateTime, nullable=False, default=datetime.date.today)
+    appointment_date = Column(Date, nullable=False)
+    appointment_time = Column(Time, nullable=False)
     status = Column(Enum(AppointmentStatus), default=AppointmentStatus.scheduled)
     reason = Column(String, nullable=True)
 

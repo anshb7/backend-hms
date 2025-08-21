@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, status, HTTPException
+from auth.authentication import role_required
 from doctor import doctor
 from models import models, schemas
 from sqlalchemy.orm import Session
@@ -18,10 +19,10 @@ router = APIRouter(
 def get_doctors(db: Session = Depends(get_db)):
     return doctor.get_all(db)
 
-@router.post("/createDoctor", response_model=schemas.DoctorCreate)
+@router.post("/createDoctor", response_model=schemas.DoctorCreate,dependencies=[Depends(role_required("doctor"))])
 def create_doctor(doctor_model: schemas.DoctorCreate, db: Session = Depends(get_db)):
     return doctor.create_doctor(db, doctor_model)
 
-@router.get("/{doctor_id}", response_model=schemas.DoctorCreate)
+@router.get("/{doctor_id}", response_model=schemas.DoctorCreate,dependencies=[Depends(role_required("doctor"))])
 def get_doctor(doctor_id: str, db: Session = Depends(get_db)):
     return doctor.get_doctor_details(db, doctor_id)
