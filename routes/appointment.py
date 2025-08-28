@@ -31,3 +31,11 @@ def get_appointmentbyDoctorID(doctor_id: str , db: Session = Depends(get_db)):
 
     appointments = query.all()
     return appointments
+
+@router.get("/patient/{patient_id}", response_model=List[schemas.AppointmentBase],dependencies=[Depends(role_required("patient"))])
+def get_appointmentbyPatientID(patient_id: str , db: Session = Depends(get_db)):
+    return appointment.get_patient_appointments(patient_id, db)
+
+@router.put("/update_status/{patient_id}/{appointment_id}", response_model=schemas.AppointmentStatus,dependencies=[Depends(role_required("patient"))])
+def update_appointment_status(patient_id: str, appointment_id: int, status: models.AppointmentStatus, db: Session = Depends(get_db)):
+    return appointment.updateAppointmentStatus(patient_id, appointment_id, status, db)

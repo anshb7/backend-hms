@@ -45,12 +45,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 # Role-based access dependency
-def role_required(required_role: str):
+def role_required(required_role: list):
     def wrapper(current_user: models.User = Depends(get_current_user)):
-        if current_user.role != required_role:
+        if current_user.role not in required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied, requires {required_role} role"
+                detail=f"Access denied, requires one of the following roles: {required_role}"
             )
         return current_user
     return wrapper

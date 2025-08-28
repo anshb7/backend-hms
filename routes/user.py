@@ -15,17 +15,31 @@ def generate_patient_uid():
     return f"USER-{uuid.uuid4().hex[:8].upper()}" 
 
 @router.post("/register")
-def register(username: str, email: str, password: str, role: str, ph_number: int, db: Session = Depends(get_db)):
+def register(user_create: schemas.UserCreate, db: Session = Depends(get_db)):
+    """
+    Registers a new user in the system.
+
+    Args:
+        user_create (schemas.UserCreate): The user registration data.
+        db (Session, optional): SQLAlchemy database session dependency.
+        
+
+    Raises:
+        HTTPException: If a user with the given email already exists.
+
+    Returns:
+        dict: A message indicating successful creation and the new user's ID.
+    """
     # check if user already exists
-    if db.query(models.User).filter(models.User.email == email).first():
+    if db.query(models.User).filter(models.User.email == user_create.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     user = models.User(
         id=generate_patient_uid(),
-        username=username,
-        email=email,
-        password=get_password_hash(password),
-        role=role,
-        ph_number=ph_number
+        username=user_create.username,
+        email=user_create.email,
+        password=get_password_hash(user_create.password),
+        role=user_create.role,
+        ph_number=user_create.ph_number
     )
     db.add(user)
     db.commit()

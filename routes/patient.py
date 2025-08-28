@@ -1,4 +1,62 @@
 from typing import List
+"""
+This module defines API routes for managing patient data in the healthcare management system.
+
+Routes:
+    - GET /patients/:
+        Retrieve a list of all patients.
+        Returns:
+            List[schemas.PatientResponse]: A list of patient response objects.
+        Response Example:
+            [
+                {
+                    "id": "123",
+                    "name": "John Doe",
+                    "age": 30,
+                    "gender": "male",
+                    "email": "john@example.com"
+                }
+            ]
+
+    - POST /patients/createPatient:
+        Create a new patient record.
+        Request Body Example:
+            {
+                "name": "Jane Doe",
+                "age": 28,
+                "gender": "female",
+                "email": "jane@example.com"
+            }
+        Dependencies:
+            - User must have the "patient" role.
+        Returns:
+            schemas.PatientResponse: The created patient response object.
+        Response Example:
+            {
+                "id": "124",
+                "name": "Jane Doe",
+                "age": 28,
+                "gender": "female",
+                "email": "jane@example.com"
+            }
+
+    - GET /patients/{patient_id}:
+        Retrieve details of a specific patient by patient ID.
+        Path Parameters:
+            patient_id (str): The unique identifier of the patient.
+        Dependencies:
+            - User must have the "patient" role.
+        Returns:
+            schemas.PatientResponse: The patient response object for the specified patient.
+        Response Example:
+            {
+                "id": "123",
+                "name": "John Doe",
+                "age": 30,
+                "gender": "male",
+                "email": "john@example.com"
+            }
+"""
 from fastapi import APIRouter, Depends, status, HTTPException
 from models import models, schemas
 from sqlalchemy.orm import Session
@@ -13,14 +71,14 @@ router = APIRouter(
     tags=["Patients"]
 )
 
-@router.get("/", response_model=List[schemas.PatientCreate])
+@router.get("/", response_model=List[schemas.Patient])
 def get_patients(db: Session = Depends(get_db)):
     return patient.get_all(db)
 
-@router.post("/createPatient", response_model=schemas.PatientCreate,dependencies=[Depends(role_required("patient"))])
-def create_patient(patient_model: schemas.PatientCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+@router.post("/createPatient", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
+def create_patient(patient_model: schemas.Patient, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     return patient.create_patient(patient_model, db, current_user)
 
-@router.get("/{patient_id}", response_model=schemas.PatientCreate,dependencies=[Depends(role_required("patient"))])
+@router.get("/{patient_id}", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
 def get_patient(patient_id: str, db: Session = Depends(get_db)):
     return patient.get_patient_details(db, patient_id)

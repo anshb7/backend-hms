@@ -13,7 +13,7 @@ def get_all(db: Session):
 
 
 def create_patient(
-    patient: schemas.PatientCreate, db: Session, current_user: models.User
+    patient: schemas.Patient, db: Session, current_user: models.User
 ):
     # Ensure only users with role=patient can create patient profiles
     if current_user.role != models.RoleEnum.patient:
