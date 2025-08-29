@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
+from medical_records.routes import records_bp
 from models import models, schemas
 from routes import patient,doctor, appointment,user
 from database import db_engine
@@ -20,3 +20,4 @@ app.include_router(user.router)
 app.include_router(patient.router)
 app.include_router(doctor.router)
 app.include_router(appointment.router)
+app.register_blueprint(records_bp)

@@ -61,3 +61,4 @@ def updateAppointmentStatus(patient_id:str,appointment_id:int,status: models.App
     db.commit()
     db.refresh(appointment)
     return appointment
+``
