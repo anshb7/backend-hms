@@ -1,7 +1,7 @@
 fastapi
 sqlalchemy
 datetime
-jose
+python-jose
 azure-storage-blob
 uvicorn
 pydantic
