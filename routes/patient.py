@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 """
 This module defines API routes for managing patient data in the healthcare management system.
@@ -57,11 +58,12 @@ Routes:
                 "email": "john@example.com"
             }
 """
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status, HTTPException
 from models import models, schemas
 from sqlalchemy.orm import Session
 from patient import patient
 from database import db_engine
+from patient.medical_records.medical_record import upload_medical_record
 from auth.authentication import role_required,get_current_user
 get_db=db_engine.get_db
 
@@ -82,3 +84,16 @@ def create_patient(patient_model: schemas.Patient, db: Session = Depends(get_db)
 @router.get("/{patient_id}", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
 def get_patient(patient_id: str, db: Session = Depends(get_db)):
     return patient.get_patient_details(db, patient_id)
+
+@router.post("/{patient_id}/u_medical_records/",response_model=schemas.MedRecord,dependencies=[Depends(role_required(["patient"]))],status_code=status.HTTP_201_CREATED)
+async def upload_medRecord(
+    title: str = Form(...),
+    record_date: str = Form(...),
+    doctor_name: str = Form(...),
+    notes: str = Form(None),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    currentUser: models.User = Depends(get_current_user),
+):
+
+    return await upload_medical_record(currentUser=currentUser, title=title, record_date=record_date, doctor_name=doctor_name, notes=notes, file=file, db=db)

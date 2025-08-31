@@ -1,0 +1,5 @@
+fastapi
+sqlalchemy
+datetime
+jose
+azure-storage-blob

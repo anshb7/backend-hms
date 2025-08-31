@@ -15,7 +15,6 @@ router = APIRouter(
 )
 
 
-
 @router.post("/book_appointment/{patient_id}/{doctor_id}", response_model=schemas.AppointmentResponse,dependencies=[Depends(role_required("patient"))])
 def create_appointment(doctor_id: str,patient_id:str,appointment_model: schemas.AppointmentCreate, db: Session = Depends(get_db)):
     return appointment.book_appointment(db, appointment_model, doctor_id,patient_id)
