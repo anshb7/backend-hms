@@ -8,3 +8,5 @@ pydantic
 pydantic[email]
 pyodbc
 dotenv
+passlib
+passlib[bcrypt]
