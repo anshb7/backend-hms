@@ -4,3 +4,4 @@ datetime
 jose
 azure-storage-blob
 uvicorn
+pydantic
