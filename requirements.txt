@@ -3,3 +3,4 @@ sqlalchemy
 datetime
 jose
 azure-storage-blob
+uvicorn
