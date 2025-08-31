@@ -11,7 +11,7 @@ from database.db_engine import get_db
 from models import models, schemas
 from dotenv import load_dotenv
 load_dotenv()
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_ACCESS_KEY")
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 AZURE_CONTAINER_NAME = "patientdocs"
 blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
 def upload_pdf_to_azure(file, patient_id: str, filename: str = None):
