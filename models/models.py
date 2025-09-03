@@ -34,7 +34,7 @@ class Patient(Base):
     age = Column(Integer, nullable=False)
     gender = Column(String(10), nullable=False)
     address = Column(String(255), nullable=False)
-    
+    ph_number = Column(String(15), ForeignKey("users.ph_number"), primary_key=False, nullable=False)
     appointments = relationship("Appointment", back_populates="patient")
     user = relationship("User", back_populates="patient")
     medical_records = relationship("MedicalRecords", back_populates="patient")
@@ -68,7 +68,7 @@ class Appointment(Base):
     appointment_time = Column(Time, nullable=False)
     status = Column(Enum(AppointmentStatus), default=AppointmentStatus.scheduled, nullable=False)
     reason = Column(String(255), nullable=True)
-    
+    notification_sent = Column(Bool, default=False)
     patient = relationship("Patient", back_populates="appointments")
     doctor = relationship("Doctor", back_populates="appointments")
 

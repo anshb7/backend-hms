@@ -3,7 +3,9 @@ from fastapi import FastAPI, HTTPException, Request, logger
 from fastapi.middleware.cors import CORSMiddleware
 from models import models, schemas
 from routes import patient,doctor, appointment,user
-from database import db_engine
+from database import db_engine, SessionLocal
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from routes.notifications import check_and_send_sms
 
 app = FastAPI()
 
@@ -29,7 +31,17 @@ async def log_requests(request: Request, call_next):
     except Exception as e:
         logger.exception(f"🔥 Error while handling request {request.url}: {e}")
         raise
+
+@app.on_event("startup")
+async def startup_event():
+    scheduler = AsyncIOScheduler()
+    # Schedule check_and_send_sms to run every hour
+    scheduler.add_job(lambda: check_and_send_sms(SessionLocal()), "interval", hours=1)
+    scheduler.start()
+    
 app.include_router(user.router)
 app.include_router(patient.router)
 app.include_router(doctor.router)
 app.include_router(appointment.router)
+
+
