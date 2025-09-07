@@ -32,7 +32,7 @@ models.Base.metadata.create_all(bind=engine)
 origins = [
     "http://localhost:5173",
     "https://localhost:5173",
-    "https://hms1-gpbsajh6cveggwg6.southeastasia-01.azurewebsites.net/"
+    "https://hms1-gpbsajh6cveggwg6.southeastasia-01.azurewebsites.net"
 ]
 app.add_middleware(
     CORSMiddleware,
