@@ -31,14 +31,15 @@ app = FastAPI(lifespan=lifespan)
 models.Base.metadata.create_all(bind=engine)
 origins = [
     "http://localhost:5173",
-    "https://localhost:5173"
+    "https://localhost:5173",
+    "https://hms1-gpbsajh6cveggwg6.southeastasia-01.azurewebsites.net/"
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
