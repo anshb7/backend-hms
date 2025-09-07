@@ -30,7 +30,7 @@ app = FastAPI(lifespan=lifespan)
 
 models.Base.metadata.create_all(bind=engine)
 origins = [
-    "http://localhost:5173",  # Vite/React/Angular dev server
+    "http://localhost:5173"
 ]
 app.add_middleware(
     CORSMiddleware,
