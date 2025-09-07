@@ -84,6 +84,9 @@ def create_patient(patient_model: schemas.Patient, db: Session = Depends(get_db)
 @router.get("/{patient_id}", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
 def get_patient(patient_id: str, db: Session = Depends(get_db)):
     return patient.get_patient_details(db, patient_id)
+@router.put("/{patient_id}/update", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
+def update_patient(patient_id: str, patient_model: schemas.Patient, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    return patient.update_patient(db, patient_id, patient_model, current_user)
 
 @router.post("/{patient_id}/u_medical_records/",response_model=schemas.MedRecord,dependencies=[Depends(role_required(["patient"]))],status_code=status.HTTP_201_CREATED)
 async def upload_medRecord(

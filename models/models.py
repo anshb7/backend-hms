@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Enum, Date, Time
+
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Enum, Date, Time,Boolean
 from sqlalchemy.orm import relationship, declarative_base
 import enum
 
@@ -20,29 +21,40 @@ class User(Base):
     ph_number = Column(String(15), nullable=False)
     role = Column(Enum(RoleEnum), default=RoleEnum.patient, nullable=False)
     
-    # Updated relationship names to be singular since uselist=False
-    patient = relationship("Patient", back_populates="user", uselist=False)
-    doctor = relationship("Doctor", back_populates="user", uselist=False)
+    patient = relationship(
+        "Patient",
+        back_populates="user",
+        uselist=False,
+        foreign_keys="[Patient.user_id]"
+    )
+    doctor = relationship(
+        "Doctor",
+        back_populates="user",
+        uselist=False,
+        foreign_keys="[Doctor.user_id]"
+    )
 
 class Patient(Base):
     __tablename__ = "patients"
     
-    # Remove the separate id column and use user_id as the only primary key
     user_id = Column(String(50), ForeignKey("users.id"), primary_key=True, nullable=False)
     medical_history = Column(String)
     full_name = Column(String(100), index=True, nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String(10), nullable=False)
     address = Column(String(255), nullable=False)
-    ph_number = Column(String(15), ForeignKey("users.ph_number"), primary_key=False, nullable=False)
+    ph_number = Column(String(15),primary_key=False, nullable=False)
     appointments = relationship("Appointment", back_populates="patient")
-    user = relationship("User", back_populates="patient")
+    user = relationship(
+        "User",
+        back_populates="patient",
+        foreign_keys="[Patient.user_id]"
+    )
     medical_records = relationship("MedicalRecords", back_populates="patient")
 
 class Doctor(Base):
     __tablename__ = "doctors"
     
-    # Remove the separate id column and use user_id as the only primary key
     user_id = Column(String(50), ForeignKey("users.id"), primary_key=True, nullable=False)
     specialization = Column(String(100), nullable=False)
     experience_years = Column(Integer, nullable=False)
@@ -51,7 +63,11 @@ class Doctor(Base):
     age = Column(Integer, nullable=False)
     
     appointments = relationship("Appointment", back_populates="doctor")
-    user = relationship("User", back_populates="doctor")
+    user = relationship(
+        "User",
+        back_populates="doctor",
+        foreign_keys="[Doctor.user_id]"
+    )
 
 class AppointmentStatus(str, enum.Enum):
     scheduled = "scheduled"
@@ -68,7 +84,7 @@ class Appointment(Base):
     appointment_time = Column(Time, nullable=False)
     status = Column(Enum(AppointmentStatus), default=AppointmentStatus.scheduled, nullable=False)
     reason = Column(String(255), nullable=True)
-    notification_sent = Column(Bool, default=False)
+    notification_sent = Column(Boolean, default=False)
     patient = relationship("Patient", back_populates="appointments")
     doctor = relationship("Doctor", back_populates="appointments")
 

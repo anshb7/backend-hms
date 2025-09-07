@@ -37,6 +37,7 @@ def create_patient(
         age=patient.age,
         gender=patient.gender,
         address=patient.address,
+        ph_number=current_user.ph_number
     )
     db.add(db_patient)
     db.commit()
@@ -50,4 +51,19 @@ def get_patient_details(db: Session, patient_id: str):
     )
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
+    return patient
+def update_patient(db: Session, patient_id: str, patient_model: schemas.Patient, current_user: models.User):
+
+    patient = db.query(models.Patient).filter(current_user.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+
+
+    patient.full_name = patient_model.full_name
+    patient.age = patient_model.age
+    patient.gender = patient_model.gender
+    patient.address = patient_model.address
+
+    db.commit()
+    db.refresh(patient)
     return patient

@@ -7,13 +7,14 @@ class UserCreate(BaseModel):
     email: str
     password: str
     role: str
-    ph_number: int
+    ph_number: str
 class Patient(BaseModel):
     full_name: str
     age: int
     gender: str
     address: str | None = None
     medical_history: str | None = None
+
 class Doctor(BaseModel):
     specialization: str
     full_name: str

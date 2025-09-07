@@ -19,7 +19,6 @@ def send_sms(to_number: str, message: str):
             to=to_number,
         )
     except Exception as e:
-        # Consider better logging here
         print(f"Error sending SMS to {to_number}: {e}")
         raise
 
@@ -34,13 +33,12 @@ def check_and_send_sms(db: Session):
           .all()
     )
     for apt in upcoming:
-        patient = db.query(Patient).filter(Patient.user_id == apt.user_id).first()
+        patient = db.query(Patient).filter(Patient.user_id == apt.patient_id).first()
         if patient and patient.ph_number:
             msg = f"Reminder: You have an appointment scheduled on {apt.appointment_date.strftime('%Y-%m-%d')} at {apt.appointment_time.strftime('%H:%M')}."
             try:
                 send_sms(patient.ph_number, msg)
                 apt.notification_sent = True
             except Exception as e:
-                # Log error here (print or logger)
                 print(f"Failed to send SMS to {patient.ph_number}: {e}")
     db.commit()

@@ -1,18 +1,40 @@
+import asyncio
 import logging
 from fastapi import FastAPI, HTTPException, Request, logger
 from fastapi.middleware.cors import CORSMiddleware
 from models import models, schemas
 from routes import patient,doctor, appointment,user
-from database import db_engine, SessionLocal
+from database.db_engine import engine,SessionLocal
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from routes.notifications import check_and_send_sms
 
-app = FastAPI()
+async def lifespan(app: FastAPI):
+    # --- Startup ---
+    scheduler = AsyncIOScheduler()
 
-models.Base.metadata.create_all(bind=db_engine.engine)
+    async def sms_job():
+        db = SessionLocal()
+        try:
+            await check_and_send_sms(db)  
+        finally:
+            db.close()
+
+    scheduler.add_job(lambda: asyncio.create_task(sms_job()), "interval", hours=1)
+    scheduler.start()
+
+    yield   
+
+
+    scheduler.shutdown(wait=False)
+app = FastAPI(lifespan=lifespan)
+
+models.Base.metadata.create_all(bind=engine)
+origins = [
+    "http://localhost:5173",  # Vite/React/Angular dev server
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (for development only!)
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
@@ -31,14 +53,6 @@ async def log_requests(request: Request, call_next):
     except Exception as e:
         logger.exception(f"🔥 Error while handling request {request.url}: {e}")
         raise
-
-@app.on_event("startup")
-async def startup_event():
-    scheduler = AsyncIOScheduler()
-    # Schedule check_and_send_sms to run every hour
-    scheduler.add_job(lambda: check_and_send_sms(SessionLocal()), "interval", hours=1)
-    scheduler.start()
-    
 app.include_router(user.router)
 app.include_router(patient.router)
 app.include_router(doctor.router)
