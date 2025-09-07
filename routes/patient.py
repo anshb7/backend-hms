@@ -81,7 +81,7 @@ def get_patients(db: Session = Depends(get_db)):
 def create_patient(patient_model: schemas.Patient, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     return patient.create_patient(patient_model, db, current_user)
 
-@router.get("/{patient_id}", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
+@router.get("/{patient_id}", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient","doctor"]))])
 def get_patient(patient_id: str, db: Session = Depends(get_db)):
     return patient.get_patient_details(db, patient_id)
 @router.put("/{patient_id}/update", response_model=schemas.Patient,dependencies=[Depends(role_required(["patient"]))])
